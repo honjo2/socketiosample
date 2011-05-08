@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="ja">
+<meta charset="utf-8">
+<head>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4/jquery.min.js"></script>
+<script type="text/javascript" src="http://cdn.socket.io/stable/socket.io.js"></script>
+<script>
+$(function() {
+    
+    var socket = new io.Socket('localhost', { port: 8124 });	 
+    socket.connect();
+    
+    socket.on('message', function(message) {
+        var m = JSON.parse(message).message;
+        if (m) {
+    	    $("#div1").append(m + '<br>');
+        }
+    });
+    
+    socket.on('disconnect', function(message) {
+    	$('#div1').append('切断されました');
+    });
+
+    $('#form1').submit(function(e) {
+        socket.send(JSON.stringify({ message: $('#text1').val() }));
+        return false;
+    });
+});
+</script>
+</head>
+
+<body>
+
+<div id="div1"></div>
+
+<form id="form1">
+    <input id="text1" type="text"/><input type="submit"/>
+</form>
+
+</body>
+</html>
