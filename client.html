@@ -7,19 +7,22 @@
 <script>
 $(function() {
     
-//    var socket = new io.Socket('localhost', { port: 8124 });
-    var socket = new io.Socket('socketiosample.duostack.net');
+    var socket = new io.Socket('localhost', { port: 8124 });
+//    var socket = new io.Socket('socketiosample.duostack.net, { port: 80 }');
     socket.connect();
     
     socket.on('message', function(message) {
-        var m = JSON.parse(message).message;
-        if (m) {
-    	    $("#div1").append(m + '<br>');
+        var json = JSON.parse(message);
+        if (json.connections) {
+            $("#connections").html(json.connections);
+        }
+        if (json.message) {
+    	    $("#message").append(json.message + '<br>');
         }
     });
     
     socket.on('disconnect', function(message) {
-    	$('#div1').append('切断されました');
+    	$('#message').append('切断されました');
     });
 
     $('#form1').submit(function(e) {
@@ -31,9 +34,11 @@ $(function() {
 </head>
 
 <body>
-
-<div id="div1"></div>
-
+接続クライアント数&nbsp;<span id="connections"></span>
+<br/><br/>
+<div id="message"></div>
+<br/>
+何か入力してください
 <form id="form1">
     <input id="text1" type="text"/><input type="submit"/>
 </form>

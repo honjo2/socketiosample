@@ -3,9 +3,6 @@ var http = require('http'),
  
 server = http.createServer(function(req, res) {
     res.writeHead(200, {'Content-Type': 'text/html'});
-//    res.write('<h1>socket.ioサンプル</h1>');
-//    res.end();
-
     res.write('<!DOCTYPE html>');
     res.write('<html lang="ja">');
     res.write('<meta charset="utf-8">');
@@ -17,9 +14,12 @@ server = http.createServer(function(req, res) {
     res.write('var socket = new io.Socket("socketiosample.duostack.net", { port: 80 });');
     res.write('socket.connect();');
     res.write('socket.on("message", function(message) {');
-    res.write('var m = JSON.parse(message).message;');
-    res.write('if (m) {');
-    res.write('$("#div1").append(m + "<br>");');
+    res.write('var json = JSON.parse(message);');
+    res.write('if (json.connections) {');
+    res.write('$("#connections").html(json.connections);');
+    res.write('}');
+    res.write('if (json.message) {');
+    res.write('$("#message").append(json.message + "<br>");');
     res.write('}');
     res.write('});');
     res.write('socket.on("disconnect", function(message) {');
@@ -33,7 +33,11 @@ server = http.createServer(function(req, res) {
     res.write('</script>');
     res.write('</head>');
     res.write('<body>');
-    res.write('<div id="div1"></div>');
+    res.write('接続クライアント数&nbsp;<span id="connections"></span>');
+    res.write('<br/><br/>');
+    res.write('<div id="message"></div>');
+    res.write('<br/>');
+    res.write('何か入力してください');
     res.write('<form id="form1">');
     res.write('<input id="text1" type="text"/><input type="submit"/>');
     res.write('</form>');
@@ -47,14 +51,15 @@ var socket = io.listen(server);
 socket.on('connection', function(client) {
     
 	client.send(JSON.stringify({ connections: client.listener.server.connections }));
+    client.broadcast(JSON.stringify({ connections: client.listener.server.connections }));
 
     client.on('message', function(message) {
-        client.send(message); // 自分のブラウザへ
-        client.broadcast(message); // 他のブラウザへ
+        client.send(message);
+        client.broadcast(message);
     });
     
     client.on('disconnect', function() {
-        client.broadcast();
+        client.broadcast(JSON.stringify({ connections: client.listener.server.connections }));
     });
 
 });
