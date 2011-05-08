@@ -8,7 +8,7 @@
 $(function() {
     
 //    var socket = new io.Socket('localhost', { port: 8124 });
-    var socket = new io.Socket('socketiosample.duostack.net', { port: 8124 });
+    var socket = new io.Socket('socketiosample.duostack.net');
     socket.connect();
     
     socket.on('message', function(message) {
